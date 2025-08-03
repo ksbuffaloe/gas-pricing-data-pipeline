@@ -10,6 +10,7 @@ API_KEY = os.getenv("API_KEY")
 url = os.getenv("API_URL")
 db_url = os.getenv("DB_URL")
 
+# Define the parameters for the API request given to us by the API documentation
 params = {
     "api_key": API_KEY,
     "frequency": "weekly",
@@ -43,7 +44,7 @@ def run_ingest():
 
     data = response.json()['response']['data']
     df = pd.DataFrame(data)
-
+    print(f"Fetched {len(df)} rows from API.")
     if df.empty:
         print(" No data returned from API, keeping old data.")
         return  # Stop! Don’t clear old rows.
@@ -58,19 +59,19 @@ def run_ingest():
     df['value'] = pd.to_numeric(df['value'], errors='coerce')
     df['period'] = pd.to_datetime(df['period'], format='%Y-%m-%d')
 
+    # Sort by period and reset index
+    df = df.sort_values(by='period').reset_index(drop=True)
+
+    #Create a SQLAlchemy engine
     engine = create_engine(db_url)
 
-    # Ensure the 'inserted_at' column is not present in the DataFrame to get a new timestamp
-    if 'inserted_at' in df.columns:
-        df = df.drop(columns=['inserted_at'])
-
-    with engine.connect() as conn:
-        # ✅ Only delete if we have good data
+    with engine.begin() as conn:
         conn.execute(text("DELETE FROM raw_prices;"))
         df.to_sql('raw_prices', conn, if_exists='append', index=False, method='multi')
 
-    print(f"Inserted {len(df)} rows into raw_prices!")
-
+    with engine.connect() as conn:
+        count_after = conn.execute(text("SELECT COUNT(*) FROM raw_prices;")).scalar()
+        print(f"Confirmed {count_after} rows now in raw_prices.")
 
 if __name__ == "__main__":
     run_ingest()
