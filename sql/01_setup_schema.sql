@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS raw_prices (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     period DATE,
     duoarea TEXT,
     area_name TEXT,
@@ -9,19 +9,17 @@ CREATE TABLE IF NOT EXISTS raw_prices (
     process_name TEXT,
     series TEXT,
     series_description TEXT,
-    value NUMERIC,
+    value REAL,
     units TEXT,
-    inserted_at TIMESTAMP DEFAULT NOW()
+    inserted_at TEXT DEFAULT (datetime('now'))
 );
 
-
 CREATE TABLE IF NOT EXISTS clean_prices (
-    id SERIAL PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     period DATE,
     product TEXT,
     product_name TEXT,
     series_description TEXT,
-    value NUMERIC,
-    ingestion_timestamp TIMESTAMP DEFAULT NOW()
+    value REAL,
+    ingestion_timestamp TEXT DEFAULT (datetime('now'))
 );
-

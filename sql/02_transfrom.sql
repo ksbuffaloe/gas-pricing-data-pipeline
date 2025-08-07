@@ -15,8 +15,8 @@ SELECT
   LOWER(TRIM(product)),
   LOWER(TRIM(product_name)),
   LOWER(TRIM(series_description)),
-  value::NUMERIC,
-  NOW()  -- adds the current timestamp for this cleaning run
+  value REAL,
+  datetime('now')
 FROM
   raw_prices
 WHERE
