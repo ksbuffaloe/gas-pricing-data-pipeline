@@ -1,35 +1,37 @@
-import psycopg2
+import sqlite3
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+# Get the current file's directory (src/)
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Get your DB URL from .env
-db_url = os.getenv("DB_URL")
+# Move up one level to project root (i.e., gas-pricing-data-pipeline/)
+project_root = os.path.dirname(base_dir)
 
-# Path to your SQL file
-SQL_FILE = "sql/02_transfrom.sql"
+# Load .env from root
+load_dotenv(os.path.join(project_root, ".env"))
+
+# Use environment variable or fallback to default SQLite DB path
+sqlite_path = os.getenv("SQLITE_DB_PATH", os.path.join(project_root, "data", "gas_prices.db"))
+
+# Path to the SQL file
+SQL_FILE = os.path.join(project_root, "sql", "02_transfrom.sql")
 
 def run_transform():
-    # Connect to the database
-    conn = psycopg2.connect(db_url)
-    cursor = conn.cursor()
+    if not os.path.exists(SQL_FILE):
+        print(f"SQL file not found at {SQL_FILE}")
+        return
 
-    # Read the SQL file
-    with open(SQL_FILE, 'r') as file:
-        sql_script = file.read()
-
-    # Execute the SQL script
-    cursor.execute(sql_script)
-
-    # Commit the changes
-    conn.commit()
-
-    # Close the connection
-    cursor.close()
-    conn.close()
+    try:
+        with sqlite3.connect(sqlite_path) as conn:
+            cursor = conn.cursor()
+            with open(SQL_FILE, 'r') as file:
+                sql_script = file.read()
+                cursor.executescript(sql_script)  # executescript for multiple statements
+            print("Transformation SQL script executed successfully.")
+    except sqlite3.Error as e:
+        print(f"SQLite error occurred: {e}")
 
 if __name__ == "__main__":
     run_transform()
     print("Transformation completed successfully!")
-    

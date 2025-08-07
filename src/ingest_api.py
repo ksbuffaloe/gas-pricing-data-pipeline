@@ -8,7 +8,15 @@ load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
 url = os.getenv("API_URL")
-db_url = os.getenv("DB_URL")
+
+# Get the absolute path to the project root (one level up from src/)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Create path to the DB file inside the data/ folder
+DB_PATH = os.path.join(BASE_DIR, "data", "gas_prices.db")
+
+# Create the SQLAlchemy engine
+
 
 # Define the parameters for the API request given to us by the API documentation
 params = {
@@ -63,7 +71,7 @@ def run_ingest():
     df = df.sort_values(by='period').reset_index(drop=True)
 
     #Create a SQLAlchemy engine
-    engine = create_engine(db_url)
+    engine = create_engine(f"sqlite:///{DB_PATH}")
 
     with engine.begin() as conn:
         conn.execute(text("DELETE FROM raw_prices;"))
