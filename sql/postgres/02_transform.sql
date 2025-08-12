@@ -1,7 +1,5 @@
--- clear previous data in clean_prices table
 DELETE FROM clean_prices;
 
--- transform data from raw_prices to clean_prices
 INSERT INTO clean_prices (
   period,
   product,
@@ -15,8 +13,8 @@ SELECT
   LOWER(TRIM(product)),
   LOWER(TRIM(product_name)),
   LOWER(TRIM(series_description)),
-  value REAL,
-  datetime('now')
+  value,
+  CURRENT_TIMESTAMP
 FROM
   raw_prices
 WHERE
