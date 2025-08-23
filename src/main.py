@@ -36,5 +36,9 @@ def run_pipeline():
             f.write(traceback.format_exc())
 
 if __name__ == "__main__":
-    run_pipeline()
-    print("Data pipeline completed successfully!")
+    try:
+        run_pipeline()
+        print("Data pipeline completed successfully!")
+    except Exception as e:
+        print(f"Data pipeline failed: {e}")
+
