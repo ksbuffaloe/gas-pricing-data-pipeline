@@ -1,23 +1,100 @@
 # Gas Pricing Data Pipeline
 
-This project pulls weekly U.S. gas price data from the [EIA Open Data API](https://www.eia.gov/opendata/), stores it in a PostgreSQL database (running in Docker), and sets you up to build an updating dashboard.
-
+This project ingests weekly U.S. gas price data from the EIA Open Data API, stores it in a database, and can automatically update on a schedule. It’s designed to support both local development and cloud deployment with an updating dashboard.
 ---
 
-## 📦 Tech stack
+## Tech stack
 
 - Python (`requests`, `pandas`, `sqlalchemy`, `dotenv`)
-- PostgreSQL (Docker container)
-- Docker Compose
-- `.env` for managing secrets
-- [EIA Open Data API](https://www.eia.gov/opendata/)
+- Databases
+    - SQLite for local testing
+    - PostgreSQL (e.g. Supabase) for cloud deployment
+- Secrets Management – .env locally, GitHub Secrets in CI/CD
+- Scheduler – GitHub Actions cron job
+- [EIA Open Data API]([https://www.eia.gov/opendata/](https://api.eia.gov/v2/petroleum/pri/gnd/data/))
 
 ---
 
 ## 🚀 How to run it
 
-### 1️⃣ Clone this repo
+### 1️. Clone this repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/gas-pricing-data-pipeline.git
+git clone https://github.com/ksbuffaloe/gas-pricing-data-pipeline.git
 cd gas-pricing-data-pipeline
+```
+
+###  2. Create a virtual environment
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # macOS/Linux
+.venv\Scripts\activate     # Windows
+
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+
+```
+
+### 4. Configure environment variables
+
+- Take note of example.env
+
+```bash
+# For local testing
+DB_URL   = sqlite:///data/gas_prices.db
+
+# For cloud deployment (comment out local, uncomment this when deploying, insert the link to whatever postgres cloud DB you choose )
+# DB_URL = postgresql+psycopg2://user:password@host:5432/dbname
+
+API_KEY  = your_api_key
+API_URL  = "https://api.eia.gov/v2/petroleum/pri/gnd/data/"
+
+```
+
+### 5. Run the Database Schema Scripts
+
+Important Note
+
+Before running the pipeline, you must configure the correct database. Update the .env file by commenting/uncommenting the appropriate DB_URL for either SQLite or Cloud Postgres. Make sure this is set correctly before each run.
+
+``` bash
+python src/setup_db.py
+```
+
+### 6. Run the pipeline
+
+``` bash
+python src/main.py
+```
+
+## ☁️ How to Deploy to the Cloud
+
+1. Provision a PostgreSQL database (e.g. Supabase or Render).
+
+2. Store the connection string in your GitHub repo as a Secret named DB_URL.
+
+3. Store your API_KEY and API_URL as Secrets as well.
+
+4. GitHub Actions workflow (.github/workflows/run_pipeline.yml) runs your pipeline automatically every Tuesday at 7 AM MST.
+
+
+## 📊 Next Steps
+
+Add a dashboard (e.g. Streamlit or Dash) that reads from the cloud database.
+
+- Deploy the dashboard to Streamlit Cloud, Render, or similar.
+- Automate further transforms and visualizations.
+
+
+```mermaid
+flowchart TD
+    A[EIA Open Data API] --> B[Python Script <br/> (requests + pandas)]
+    B --> C[PostgreSQL Database <br/> (Supabase Cloud / Local Docker)]
+    C --> D[Dashboard / BI Tool <br/> (future visualization)]
+```
+
