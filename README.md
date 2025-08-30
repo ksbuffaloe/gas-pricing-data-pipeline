@@ -42,7 +42,7 @@ pip install -r requirements.txt
 ### 4. Configure environment variables and register for API key
 
 - 1. Get a free API key from the [EIA API Registration Page](https://www.eia.gov/opendata/register.php).
--2. Store this API key in your local .env and github secrets as `API_key`
+- 2. Store this API key in your local .env and github secrets as `API_key`
 
 ```bash
 # For local testing
@@ -93,8 +93,10 @@ Add a dashboard (e.g. Streamlit or Dash) that reads from the cloud database.
 
 ```mermaid
 flowchart TD
-    A[EIA Open Data API] --> B[Python Script <br/> (requests + pandas)]
-    B --> C[PostgreSQL Database <br/> (Supabase Cloud / Local Docker)]
-    C --> D[Dashboard / BI Tool <br/> (future visualization)]
+    A[User] --> B[Python Script: requests + pandas]
+    B --> C[Process Data]
+    C --> D[Store in Database]
+    D --> E[GitHub Actions Workflow]
+    E --> F[Dashboard / Report]
 ```
 
