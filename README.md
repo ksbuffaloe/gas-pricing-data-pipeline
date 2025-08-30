@@ -11,10 +11,9 @@ This project ingests weekly U.S. gas price data from the EIA Open Data API, stor
     - PostgreSQL (e.g. Supabase) for cloud deployment
 - Secrets Management – .env locally, GitHub Secrets in CI/CD
 - Scheduler – GitHub Actions cron job
-- [EIA Open Data API]([https://www.eia.gov/opendata/](https://api.eia.gov/v2/petroleum/pri/gnd/data/))
+- EIA Open Data API
 
 ---
-
 ## 🚀 How to run it
 
 ### 1️. Clone this repo
@@ -40,9 +39,10 @@ pip install -r requirements.txt
 
 ```
 
-### 4. Configure environment variables
+### 4. Configure environment variables and register for API key
 
-- Take note of example.env
+- 1. Get a free API key from the [EIA API Registration Page](https://www.eia.gov/opendata/register.php).
+-2. Store this API key in your local .env and github secrets as `API_key`
 
 ```bash
 # For local testing
